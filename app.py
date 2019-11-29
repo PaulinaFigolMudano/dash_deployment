@@ -34,13 +34,13 @@ colors = {
     'text': '#7FDBFF'
 }
 
-app.layout = html.Div( #style={'backgroundColor': colors['background']},
+app.layout = html.Div( style={'backgroundColor': colors['background']},
 	 children=[
     	html.H1(children='Hello Dash',
 	
 	#style={
-        #    'textAlign': 'center',
-        #    'color': colors['text']
+      #      'textAlign': 'center',
+       #     'color': colors['text']
         #}
 	),
 

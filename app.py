@@ -10,18 +10,18 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 
-#df = pd.read_csv('https://gist.githubusercontent.com/chriddyp/c78bf172206ce24f77d6363a2d754b59/raw/c353e8ef842413cae56ae3920b8fd78468aa4cb2/usa-agricultural-exports-2011.csv')
+df = pd.read_csv('https://gist.githubusercontent.com/chriddyp/c78bf172206ce24f77d6363a2d754b59/raw/c353e8ef842413cae56ae3920b8fd78468aa4cb2/usa-agricultural-exports-2011.csv')
 
-#def generate_table(dataframe, max_rows=10):
-#    return html.Table(
-#        # Header
-#        [html.Tr([html.Th(col) for col in dataframe.columns])] +
+def generate_table(dataframe, max_rows=10):
+    return html.Table(
+        # Header
+        [html.Tr([html.Th(col) for col in dataframe.columns])] +
 
- #       # Body
- #       [html.Tr([
- #           html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
- #       ]) for i in range(min(len(dataframe), max_rows))]
- #   )
+        # Body
+        [html.Tr([
+            html.Td(dataframe.iloc[i][col]) for col in dataframe.columns
+        ]) for i in range(min(len(dataframe), max_rows))]
+    )
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -34,14 +34,14 @@ colors = {
     'text': '#7FDBFF'
 }
 
-app.layout = html.Div( #style={'backgroundColor': colors['background']},
+app.layout = html.Div( style={'backgroundColor': colors['background']},
 	 children=[
     	html.H1(children='Hello Dash',
 	
-	#style={
-      #      'textAlign': 'center',
-       #     'color': colors['text']
-        #}
+	style={
+            'textAlign': 'center',
+            'color': colors['text']
+        }
 	),
 
     html.Div(children='''
@@ -51,9 +51,9 @@ app.layout = html.Div( #style={'backgroundColor': colors['background']},
     '''
 	#,
 	#style={
-        #    'textAlign': 'center',
-        #    'color': colors['text']
-        #}
+     #       'textAlign': 'center',
+      #      'color': colors['text']
+       # }
 ),
 
     dcc.Graph(
@@ -74,8 +74,8 @@ app.layout = html.Div( #style={'backgroundColor': colors['background']},
             }
         }
     )   
-	#, html.H4(children='US Agriculture Exports (2011)'),
-    	#generate_table(df)
+	, html.H4(children='US Agriculture Exports (2011)'),
+    	generate_table(df)
 ])
 
 if __name__ == '__main__':

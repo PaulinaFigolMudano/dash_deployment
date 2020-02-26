@@ -5,3 +5,5 @@ gunicorn==19.9.0
 jupyter==1.0.0
 numpy==1.15.4
 pandas==0.24.0
+dash-table==4.6.0
+plotly==4.5.0

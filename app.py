@@ -14,6 +14,7 @@ import pickle
 import plotly.graph_objects as go
 import base64
 import dash_table
+from itertools import repeat
 
 
 
@@ -227,15 +228,35 @@ def utilityfunc(n_clicks, value1, value2, value4):
     data = pd.DataFrame(a, columns=['pred_proba', 'true'])
     TPFPTNFN = pd.DataFrame(columns=['TP','FP','TN','FN'])
     
+ #   for i in range(len(a)):
+ #       if (round(a[i][0])==1 and a[i][1]==1).all():
+ #           TPFPTNFN = TPFPTNFN.append({'TP': 1}, ignore_index=True)
+ #       elif (round(a[i][0])==0 and a[i][1]==0).all():
+ #               TPFPTNFN = TPFPTNFN.append({'TN': 1}, ignore_index=True)
+ #       elif (round(a[i][0])==1 and a[i][1]==0).all():
+ #               TPFPTNFN = TPFPTNFN.append({'FP': 1}, ignore_index=True)
+ #       elif (round(a[i][0])==0 and a[i][1]==1).all():
+ #               TPFPTNFN = TPFPTNFN.append({'FN': 1}, ignore_index=True)
+ 
+    TP = list(repeat(0, len(a)))
+    FP = list(repeat(0, len(a)))
+    TN = list(repeat(0, len(a)))
+    FN = list(repeat(0, len(a)))
+    
     for i in range(len(a)):
-        if (round(a[i][0])==1 and a[i][1]==1).all():
-            TPFPTNFN = TPFPTNFN.append({'TP': 1}, ignore_index=True)
-        elif (round(a[i][0])==0 and a[i][1]==0).all():
-                TPFPTNFN = TPFPTNFN.append({'TN': 1}, ignore_index=True)
-        elif (round(a[i][0])==1 and a[i][1]==0).all():
-                TPFPTNFN = TPFPTNFN.append({'FP': 1}, ignore_index=True)
-        elif (round(a[i][0])==0 and a[i][1]==1).all():
-                TPFPTNFN = TPFPTNFN.append({'FN': 1}, ignore_index=True)
+        if (round(a[i][0])==1 and a[i][1]==1):
+            TP[i] = 1
+        elif (round(a[i][0])==0 and a[i][1]==0):
+            TN[i] = 1
+        elif (round(a[i][0])==1 and a[i][1]==0):
+            FP[i] = 1
+        elif (round(a[i][0])==0 and a[i][1]==1):
+            FN[i] = 1
+            
+    TPFPTNFN.TP = TP 
+    TPFPTNFN.FP = FP 
+    TPFPTNFN.TN = TN 
+    TPFPTNFN.FN = FN 
                 
     TPFPTNFN = TPFPTNFN.fillna(0, inplace=False)
     

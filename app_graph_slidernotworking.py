@@ -13,7 +13,6 @@ import numpy as np
 import pickle
 import plotly.graph_objects as go
 import base64
-import dash_table
 
 
 
@@ -37,7 +36,7 @@ import dash_table
 #        raise PercentageError(f"Percentage value {perc_contacted} outside of the limits. Please input a number between 0 and 100.") 
 
 
-params = ['x_axis', 'utility2']
+params = ['pred_proba'	,'true',	'cost',	'cumul_cost',	'saving']
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -105,17 +104,17 @@ escalation is associated with cost and time savings.''', style={'text-align': 'c
     style={'width': '250px', 'margin-right': 'auto',
            'margin-left': 'auto', 'text-align': 'center', 'color': colors['text']}),
 
-#    html.P([
-#        html.Label('Percentage to automate:'),
-#        dcc.Input(
-#                id='perc',
-#                placeholder='Enter a number between 0 and 100..',
-#                type='number',
-#                value=None
-#                )
- #   ],
- #   style={'width': '250px', 'margin-right': 'auto',
- #          'margin-left': 'auto', 'text-align': 'center', 'color': colors['text']}),
+    html.P([
+        html.Label('Percentage to automate:'),
+        dcc.Input(
+                id='perc',
+                placeholder='Enter a number between 0 and 100..',
+                type='number',
+                value=None
+                )
+    ],
+    style={'width': '250px', 'margin-right': 'auto',
+           'margin-left': 'auto', 'text-align': 'center', 'color': colors['text']}),
 
     html.P([
         html.Label('Total number of data issues:'),
@@ -160,40 +159,59 @@ escalation is associated with cost and time savings.''', style={'text-align': 'c
     dcc.RangeSlider(
         id='non-linear-range-slider',
         #marks={i: '{}'.format(10 ** i) for i in range(4)},
-        min = 0,
-        max = 1,
+        #max=3,
         value=[0,1],
         dots=False,
-        step=0.01,
+        #step=0.01,
         updatemode='drag'
-    ),
-            
-    dash_table.DataTable(id='datatable-upload-container',                          
-                                 columns=[{"name": i, "id": i} for i in params])    
+    )
     ])
 
 @app.callback(
      [dash.dependencies.Output('dd2-output-container', 'children'),
-      dash.dependencies.Output('datatable-upload-container', 'data')#,
+      dash.dependencies.Output('example-graph', 'figure')#,
       #dash.dependencies.Output('report-text', 'children')
       ],
-      [dash.dependencies.Input('submit-button', 'n_clicks')],
+      [dash.dependencies.Input('submit-button', 'n_clicks'),
+       dash.dependencies.Input('non-linear-range-slider', 'value')],
     [dash.dependencies.State('reviewing_query', 'value'),
     dash.dependencies.State('false_negative', 'value'),
-#    dash.dependencies.State('perc', 'value'),
+    dash.dependencies.State('perc', 'value'),
     dash.dependencies.State('queries', 'value')
     ])
     
-def utilityfunc(n_clicks, value1, value2, value4):
-      
-#    perc_contacted = 100
+def utilityfunc(n_clicks,slider, value1, value2, value3, value4):
+    
+    fig = go.Figure(
+            layout=go.Layout(
+                    xaxis={
+                        ####'rangeslider': {'visible':True},
+                        ####'rangeselector': {'visible':True, 'buttons':[{'step':'all'}], 'yanchor' : 'top'},
+                        'tickformat' : '%',
+                        'autorange' : True,
+                        'range' : [0,1]
+                    },
+                    yaxis=dict(
+                            autorange = True,
+                            fixedrange= False,
+                            tickformat= '%',
+                            range = [0,1]
+   ), paper_bgcolor='rgba(0,0,0,0)'#,
+        ,font=dict(
+       #family="Courier New, monospace",
+        size=13,
+        color=colors['text']
+    )
+      #plot_bgcolor='rgb(255, 255, 255)'
+                )
+           )    
+    
+    perc_contacted = value3
     total_no_queries = value4
     
-    df_empty = pd.DataFrame(columns = params)
-    
-    if (value1 == None) or (value2 ==None) or (value4==None):
+    if (value1 == None) or (value2 ==None) or (value3==None) or (value4==None):
         #print("Gain by automating %d%% of the queries in Pounds: %s" % (perc_contacted, Current_spent))
-        return [dcc.Markdown('''Gain is unknown''',style={'color': colors['text']})], df_empty.to_dict('records')
+        return [dcc.Markdown('''Gain is unknown''',style={'color': colors['text']})], fig
         
     #import train and test data sets:
     y_test_T = pd.read_csv('y_test.csv', header=None).iloc[:,1]#[1]
@@ -212,16 +230,16 @@ def utilityfunc(n_clicks, value1, value2, value4):
     Current_spent = VALUE_FALSE_POSITIVE*total_no_queries
     #Current_spent *= total_no_queries / len(y_test_T)
     
- #   k = int(len(y_test_T)*perc_contacted / 100)
-#    a = list(zip(pred,y_test_T))
-#    a.sort(key=lambda x: x[0], reverse=True)
+    k = int(len(y_test_T)*perc_contacted / 100)
+    a = list(zip(pred,y_test_T))
+    a.sort(key=lambda x: x[0], reverse=True)
     
-#    true_positives = sum(map(lambda x: x[1], a[:k]))
+    true_positives = sum(map(lambda x: x[1], a[:k]))
     #false_positives = k - true_positives
-#    false_negatives = sum(map(lambda x: x[1], a[k:]))
+    false_negatives = sum(map(lambda x: x[1], a[k:]))
     #true_negatives = len(y_test_T) - k - false_negatives
         
- #   k = int(perc_contacted*len(pred) /100)
+    k = int(perc_contacted*len(pred) /100)
     a = list(zip(pred,y_test_T.values))
     a.sort(key=lambda x: x[0], reverse=True)
     data = pd.DataFrame(a, columns=['pred_proba', 'true'])
@@ -249,15 +267,15 @@ def utilityfunc(n_clicks, value1, value2, value4):
 
     data['saving'] = data['cumul_cost']/abs(Current_spent) * 100
     
-#    if perc_contacted == 0:
-#        print("Gain by automating %d%% of the queries: £%s" % (perc_contacted, Current_spent))
-#    else:
-#        perc_idx = int(perc_contacted*len(data)/100)
-#        if perc_idx == 0:
-#            perc_idx = 1
+    if perc_contacted == 0:
+        print("Gain by automating %d%% of the queries: £%s" % (perc_contacted, Current_spent))
+    else:
+        perc_idx = int(perc_contacted*len(data)/100)
+        if perc_idx == 0:
+            perc_idx = 1
         #print(f'perc_idx={perc_idx}')
-#        print("Gain by automating %d%% of the queries: £%s" 
-#              % (perc_contacted,data['cumul_cost'][perc_idx-1]))  
+        print("Gain by automating %d%% of the queries: £%s" 
+              % (perc_contacted,data['cumul_cost'][perc_idx-1]))  
         
     utility2 = [0] + list(data.saving/100)
     NUM_SAMPLES=len(y_test_T)
@@ -275,10 +293,10 @@ def utilityfunc(n_clicks, value1, value2, value4):
 #    xaxis_title="Percentage of automated cases",
 #    yaxis_title="% Utility (Saving/Loss)")
     
- #   if perc_contacted != 0:
- #       rounded = round(data['cumul_cost'][perc_idx-1],2)
- #   else:
-  #      rounded = Current_spent
+    if perc_contacted != 0:
+        rounded = round(data['cumul_cost'][perc_idx-1],2)
+    else:
+        rounded = Current_spent
         
         
     lis = [(x_axis[i], utility2[i]*100) for i in range(len(x_axis))]
@@ -290,8 +308,9 @@ def utilityfunc(n_clicks, value1, value2, value4):
     lis2 = lis2[1:]
 
     sen = '''Current spending: £%s.  
+             Gain by automating %d%% of the queries: £%s.  
              **Maximum saving** rate is **%s%%** if %s%% percent of queries is automated.  
-             This accounts for **£%s saved**. ''' % (round(Current_spent,2),\
+             This accounts for **£%s saved**. ''' % (round(Current_spent,2),perc_contacted,rounded,\
             best[1], best[0]*100, round((best[1]*(-Current_spent))/100, 2))
             
     #, round(best[1]*(-Current_spent)/100, 2)
@@ -305,66 +324,18 @@ def utilityfunc(n_clicks, value1, value2, value4):
     {'x_axis': x_axis,
      'utility2': utility2
     })
-    
-    df = pd.DataFrame(df.groupby(['x_axis'], sort=False)['x_axis','utility2'].max())
     print(df)
-                        
-    return [dcc.Markdown(sen,style={'color': colors['text']})], df.to_dict('records')
+    df = df[df.x_axis.between(slider[0],slider[1])]
                     
-
-@app.callback(
-      dash.dependencies.Output('example-graph', 'figure'),
-      [dash.dependencies.Input('datatable-upload-container', 'data'),
-       dash.dependencies.Input('non-linear-range-slider', 'value')
-       ])
-
-def update_g(data, slider):
-    
-    fig = go.Figure(
-            layout=go.Layout(
-                    xaxis={
-                        ####'rangeslider': {'visible':True},
-                        ####'rangeselector': {'visible':True, 'buttons':[{'step':'all'}], 'yanchor' : 'top'},
-                        'tickformat' : '%',
-                        'autorange' : True,
-                        'range' : [0,1]
-                    },
-                    yaxis=dict(
-                            autorange = True,
-                            fixedrange= False,
-                            tickformat= '%',
-                            range = [0,1]
-                            ), paper_bgcolor='rgba(0,0,0,0)'#,
-        ,font=dict(
-       #family="Courier New, monospace",
-        size=13,
-        color=colors['text']
-        )
-      #plot_bgcolor='rgb(255, 255, 255)'
-                )
-           )   
-
-    if not data:
-        return fig
-    
-    else:
-        df = pd.DataFrame(data, columns =['x_axis', 'utility2'])
-
-        df = df[df.x_axis.between(slider[0],slider[1])]
-                    
-        fig = fig.add_trace(go.Scatter(x=df.loc[:,'x_axis'], y=df.loc[:,'utility2'], fill='tozeroy',
-                                       hovertemplate = 'Price: %{y:%.3f%}<extra></extra>',
+    fig = fig.add_trace(go.Scatter(x=df.loc[:,'x_axis'], y=df.loc[:,'utility2'], fill='tozeroy',
                     mode='none' # override default markers+lines
                     ))
     
-        fig = fig.update_layout(
-                xaxis_title="Percentage of automated cases",
-                yaxis_title="% Utility (Saving/Loss)"
-                #,hovertemplate = "Popularity: %{df.loc[:,'x_axis']}"
-                )
-        
-        #print('You have selected "{}"'.format(slider))
-        return fig
+    fig = fig.update_layout(
+    xaxis_title="Percentage of automated cases",
+    yaxis_title="% Utility (Saving/Loss)")
+    
+    return [dcc.Markdown(sen,style={'color': colors['text']})], fig
 
     
 if __name__ == '__main__':

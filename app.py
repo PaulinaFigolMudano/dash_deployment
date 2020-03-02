@@ -64,7 +64,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background'], 'font-fami
             ),
     # html.Link(href='/assets/stylesheet.css', rel='stylesheet'),
     html.Br(),
-    html.H3(
+    html.H2(
         children='Using Machine Learning to solve Data Quality Issues',
         style={'text-align': 'center', 'color': '#332F33'}
     ), 
@@ -76,10 +76,10 @@ The below plot uses a text-based machine learning model predicting __escalation 
 
 The utility cost-benefit plot reflects percentage saving/cost from automating a fraction of data issues predictions. As the model predicts escalation 
 of the issues, there is an optimal point of queries for which tagging should be automated - these are the most likely escalated queries. Their prompt
-escalation is associated with cost and time savings.''', style={'text-align': 'center', 'color': '#6D6A6D'}),
+escalation is associated with cost and time savings.''', style={'text-align': 'center', 'color': '#6D6A6D', 'fontSize':18}),
     html.Br(),
         dcc.Markdown('''Submit the following values to create utility plot:''', 
-                     style={'text-align': 'center', 'color': '#332F33'}),
+                     style={'text-align': 'center', 'color': '#332F33', 'fontSize':20}),
         html.Div([
     html.P([
         html.Label('Cost of reviewing a query by agent:'),
@@ -331,7 +331,7 @@ def utilityfunc(n_clicks, value1, value2, value4):
     df = pd.DataFrame(df.groupby(['x_axis'], sort=False)['x_axis','utility2'].max())
     print(df)
                         
-    return [dcc.Markdown(sen,style={'color': '#332F33'})], df.to_dict('records')
+    return [dcc.Markdown(sen,style={'color': '#332F33', 'fontSize':20})], df.to_dict('records')
                     
 
 @app.callback(

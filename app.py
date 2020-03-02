@@ -43,7 +43,7 @@ params = ['x_axis', 'utility2']
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 colors = {
-    'background': '#AF1C63',
+    'background': '#F9F0F9',#'#AF1C63',
     'text': '#FFFFFF'
 }
 
@@ -52,7 +52,7 @@ colors = {
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 
-app.layout = html.Div(style={'backgroundColor': colors['background']},children=[
+app.layout = html.Div(style={'backgroundColor': colors['background'], 'font-family': 'Corbel Regular'},children=[
         
     html.Img(
                 id='las-logo',
@@ -76,7 +76,7 @@ The below plot uses a text-based machine learning model predicting __escalation 
 
 The utility cost-benefit plot reflects percentage saving/cost from automating a fraction of data issues predictions. As the model predicts escalation 
 of the issues, there is an optimal point of queries for which tagging should be automated - these are the most likely escalated queries. Their prompt
-escalation is associated with cost and time savings.''', style={'text-align': 'center', 'color': '#332F33'}),
+escalation is associated with cost and time savings.''', style={'text-align': 'center', 'color': '#6D6A6D'}),
     html.Br(),
         dcc.Markdown('''Submit the following values to create utility plot:''', 
                      style={'text-align': 'center', 'color': '#332F33'}),
@@ -90,8 +90,8 @@ escalation is associated with cost and time savings.''', style={'text-align': 'c
                 type='number',
                 value=None)
     ],
-    style={'width': '250px', 'margin-right': 'auto',
-           'margin-left': 'auto', 'text-align': 'center', 'color': colors['text']}),
+    style={'width': '250px', 'margin-right': 'auto','font-weight': 'bold',
+           'margin-left': 'auto', 'text-align': 'center', 'color': '#332F33'}),
     # 'margin-left': '40px', 'text-align': 'center'}),
 
     html.P([
@@ -103,8 +103,8 @@ escalation is associated with cost and time savings.''', style={'text-align': 'c
                 value=None
                 )
     ],
-    style={'width': '250px', 'margin-right': 'auto',
-           'margin-left': 'auto', 'text-align': 'center', 'color': colors['text']}),
+    style={'width': '250px', 'margin-right': 'auto','font-weight': 'bold',
+           'margin-left': 'auto', 'text-align': 'center', 'color': '#332F33'}),
 
 #    html.P([
 #        html.Label('Percentage to automate:'),
@@ -124,11 +124,12 @@ escalation is associated with cost and time savings.''', style={'text-align': 'c
                 id='queries',
                 placeholder='Enter valid number..',
                 type='number',
-                value=None
+                value=None,
+                min=0
                 )
     ],
-    style={'width': '250px', 'margin-right': 'auto',
-           'margin-left': 'auto', 'text-align': 'center', 'color': colors['text']}),
+    style={'width': '250px', 'margin-right': 'auto', 'font-weight': 'bold',
+           'margin-left': 'auto', 'text-align': 'center', 'color': '#332F33'}),
     ],
 
                className='input-wrapper'),    
@@ -155,7 +156,7 @@ escalation is associated with cost and time savings.''', style={'text-align': 'c
         dcc.Graph(
             id='example-graph',
                 style={
-            'height': 700, 'color': colors['text']
+            'height': 700, 'color': '#656365'
         }
         )]),
     dcc.RangeSlider(
@@ -168,7 +169,7 @@ escalation is associated with cost and time savings.''', style={'text-align': 'c
         step=0.01,
         updatemode='drag'
     ),
-            
+    html.Br(),
     dash_table.DataTable(id='datatable-upload-container',                          
                                  columns=[{"name": i, "id": i} for i in params])    
     ])
@@ -194,7 +195,7 @@ def utilityfunc(n_clicks, value1, value2, value4):
     
     if (value1 == None) or (value2 ==None) or (value4==None):
         #print("Gain by automating %d%% of the queries in Pounds: %s" % (perc_contacted, Current_spent))
-        return [dcc.Markdown('''Gain is unknown''',style={'color': colors['text']})], df_empty.to_dict('records')
+        return [dcc.Markdown('''Gain is unknown''',style={'color': '#332F33'})], df_empty.to_dict('records')
         
     #import train and test data sets:
     y_test_T = pd.read_csv('y_test.csv', header=None).iloc[:,1]#[1]
@@ -330,7 +331,7 @@ def utilityfunc(n_clicks, value1, value2, value4):
     df = pd.DataFrame(df.groupby(['x_axis'], sort=False)['x_axis','utility2'].max())
     print(df)
                         
-    return [dcc.Markdown(sen,style={'color': colors['text']})], df.to_dict('records')
+    return [dcc.Markdown(sen,style={'color': '#332F33'})], df.to_dict('records')
                     
 
 @app.callback(
@@ -359,7 +360,7 @@ def update_g(data, slider):
         ,font=dict(
        #family="Courier New, monospace",
         size=13,
-        color=colors['text']
+        color='#656365'
         )
       #plot_bgcolor='rgb(255, 255, 255)'
                 )
